@@ -1,16 +1,17 @@
-using Microsoft.Extensions.Options;
-
 namespace Gateway.Config;
 
 public static class ProxyConfig
 {
   public static IServiceCollection UseReverseProxy(this IServiceCollection services)
   {
-    var apiConfig = services.BuildServiceProvider()
-      .GetRequiredService<IOptions<ApiConfig>>().Value;
+    IProxyDefinitions<GatewayProxyDefinitions> gatewayProxyDefinitions = services.BuildServiceProvider()
+      .GetRequiredService<IProxyDefinitions<GatewayProxyDefinitions>>();
+
+    var Routes = gatewayProxyDefinitions.GetRoutes();
+    var Clusters = gatewayProxyDefinitions.GetClusters();
 
     services.AddReverseProxy()
-      .LoadApiProxyConfiguration(apiConfig);
+      .LoadFromMemory(Routes, Clusters);
 
     return services;
   }
