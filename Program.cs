@@ -1,24 +1,30 @@
 using Gateway.Config;
 using Gateway.Config.Api;
 using Gateway.Config.Auth;
+using Gateway.Config.PaymentGateway;
 using Gateway.Config.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+IConfigurationSection paymentGatewaySection = builder.Configuration.GetSection(PaymentGatewayConfig.SectionName);
 IConfigurationSection servicesSection = builder.Configuration.GetSection(ServicesConfig.SectionName);
 IConfigurationSection authSection = builder.Configuration.GetSection(AuthConfig.SectionName);
 IConfigurationSection apiSection = builder.Configuration.GetSection(ApiConfig.SectionName);
 IConfigurationSection appSection = builder.Configuration.GetSection(AppConfig.SectionName);
+
+builder.Services.Configure<PaymentGatewayConfig>(paymentGatewaySection);
 builder.Services.Configure<ServicesConfig>(servicesSection);
 builder.Services.Configure<AuthConfig>(authSection);
 builder.Services.Configure<ApiConfig>(apiSection);
 builder.Services.Configure<AppConfig>(appSection);
 
-var servicesConfig = authSection.Get<ServicesConfig>();
+var paymentGatewayConfig = paymentGatewaySection.Get<PaymentGatewayConfig>();
+var servicesConfig = servicesSection.Get<ServicesConfig>();
 var authConfig = authSection.Get<AuthConfig>();
 var apiConfig = apiSection.Get<ApiConfig>();
 var appConfig = appSection.Get<AppConfig>();
 
+if (paymentGatewayConfig is null) throw new Exception("PaymentGatewayConfig not provided.");
 if (servicesConfig is null) throw new Exception("ServicesConfig not provided.");
 if (authConfig is null) throw new Exception("AuthConfig not provided.");
 if (apiConfig is null) throw new Exception("ApiConfig not provided.");
@@ -26,6 +32,7 @@ if (appConfig is null) throw new Exception("AppConfig not provided.");
 
 builder.WebHost.UseUrls($"http://*:{appConfig.Port}");
 
+builder.Services.AddSingleton<IProxyDefinitions<PaymentGatewayProxyDefinitions>, PaymentGatewayProxyDefinitions>();
 builder.Services.AddSingleton<IProxyDefinitions<ServicesProxyDefinitions>, ServicesProxyDefinitions>();
 builder.Services.AddSingleton<IProxyDefinitions<AuthProxyDefinitions>, AuthProxyDefinitions>();
 builder.Services.AddSingleton<IProxyDefinitions<ApiProxyDefinitions>, ApiProxyDefinitions>();
