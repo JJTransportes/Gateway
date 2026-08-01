@@ -1,0 +1,73 @@
+include:
+  - ../Auth/docker-compose.yaml
+
+services:
+  gateway:
+    container_name: gateway
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+
+      AppConfig__Port: 5000
+      AppConfig__Service: Gateway
+      AppConfig__Status: Running
+
+      AuthConfig__AcessPolicy: AuthAccessPolicy
+      AuthConfig__ClusterAddress: http://auth:5100
+      AuthConfig__ClusterId: auth-cluster-id
+      AuthConfig__ClusterKey: auth
+      AuthConfig__DefaultPolicy: Anonymous
+      AuthConfig__Path: auth/{**catch-all}
+      AuthConfig__Route: auth
+      AuthConfig__RouteId: auth-route-id
+
+      ApiConfig__AcessPolicy: ApiAccessPolicy
+      ApiConfig__ClusterAddress: http://api:5200
+      ApiConfig__ClusterId: api-cluster-id
+      ApiConfig__ClusterKey: api
+      ApiConfig__DefaultPolicy: Anonymous
+      ApiConfig__Path: api/{**catch-all}
+      ApiConfig__Route: api
+      ApiConfig__RouteId: api-route-id
+
+      ServicesConfig__AcessPolicy: ServicesAccessPolicy
+      ServicesConfig__ClusterAddress: http://services:5300
+      ServicesConfig__ClusterId: services-cluster-id
+      ServicesConfig__ClusterKey: services
+      ServicesConfig__DefaultPolicy: Anonymous
+      ServicesConfig__Path: services/{**catch-all}
+      ServicesConfig__Route: services
+      ServicesConfig__RouteId: services-route-id
+
+      PaymentGatewayConfig__AcessPolicy: PaymentGatewayAccessPolicy
+      PaymentGatewayConfig__ClusterAddress: http://payment-gateway:5400
+      PaymentGatewayConfig__ClusterId: payment-gateway-cluster-id
+      PaymentGatewayConfig__ClusterKey: payment-gateway
+      PaymentGatewayConfig__DefaultPolicy: Anonymous
+      PaymentGatewayConfig__Path: payment-gateway/{**catch-all}
+      PaymentGatewayConfig__Route: payment-gateway
+      PaymentGatewayConfig__RouteId: payment-gateway-route-id
+
+      WebhooksConfig__AcessPolicy: WebhooksAccessPolicy
+      WebhooksConfig__ClusterAddress: http://webhooks:5500
+      WebhooksConfig__ClusterId: webhooks-cluster-id
+      WebhooksConfig__ClusterKey: webhooks
+      WebhooksConfig__DefaultPolicy: Anonymous
+      WebhooksConfig__Path: webhooks/{**catch-all}
+      WebhooksConfig__Route: webhooks
+      WebhooksConfig__RouteId: webhooks-route-id
+
+      Logging__LogLevel__Default: Information
+      Logging__LogLevel__Microsoft.AspNetCore: Warning
+
+    networks:
+      - local-network
+
+networks:
+  local-network:
+    name: local-network
+    external: true
