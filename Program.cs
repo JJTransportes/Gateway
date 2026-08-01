@@ -3,27 +3,32 @@ using Gateway.Config.Api;
 using Gateway.Config.Auth;
 using Gateway.Config.PaymentGateway;
 using Gateway.Config.Services;
+using Gateway.Config.Webhooks;
 
 var builder = WebApplication.CreateBuilder(args);
 
+IConfigurationSection webhooksSection = builder.Configuration.GetSection(WebhooksConfig.SectionName);
 IConfigurationSection paymentGatewaySection = builder.Configuration.GetSection(PaymentGatewayConfig.SectionName);
 IConfigurationSection servicesSection = builder.Configuration.GetSection(ServicesConfig.SectionName);
 IConfigurationSection authSection = builder.Configuration.GetSection(AuthConfig.SectionName);
 IConfigurationSection apiSection = builder.Configuration.GetSection(ApiConfig.SectionName);
 IConfigurationSection appSection = builder.Configuration.GetSection(AppConfig.SectionName);
 
+builder.Services.Configure<WebhooksConfig>(webhooksSection);
 builder.Services.Configure<PaymentGatewayConfig>(paymentGatewaySection);
 builder.Services.Configure<ServicesConfig>(servicesSection);
 builder.Services.Configure<AuthConfig>(authSection);
 builder.Services.Configure<ApiConfig>(apiSection);
 builder.Services.Configure<AppConfig>(appSection);
 
+var webhooksConfig = webhooksSection.Get<WebhooksConfig>();
 var paymentGatewayConfig = paymentGatewaySection.Get<PaymentGatewayConfig>();
 var servicesConfig = servicesSection.Get<ServicesConfig>();
 var authConfig = authSection.Get<AuthConfig>();
 var apiConfig = apiSection.Get<ApiConfig>();
 var appConfig = appSection.Get<AppConfig>();
 
+if (webhooksConfig is null) throw new Exception("WebhooksConfig not provided.");
 if (paymentGatewayConfig is null) throw new Exception("PaymentGatewayConfig not provided.");
 if (servicesConfig is null) throw new Exception("ServicesConfig not provided.");
 if (authConfig is null) throw new Exception("AuthConfig not provided.");
@@ -32,6 +37,7 @@ if (appConfig is null) throw new Exception("AppConfig not provided.");
 
 builder.WebHost.UseUrls($"http://*:{appConfig.Port}");
 
+builder.Services.AddSingleton<IProxyDefinitions<WebhooksProxyDefinitions>, WebhooksProxyDefinitions>();
 builder.Services.AddSingleton<IProxyDefinitions<PaymentGatewayProxyDefinitions>, PaymentGatewayProxyDefinitions>();
 builder.Services.AddSingleton<IProxyDefinitions<ServicesProxyDefinitions>, ServicesProxyDefinitions>();
 builder.Services.AddSingleton<IProxyDefinitions<AuthProxyDefinitions>, AuthProxyDefinitions>();
