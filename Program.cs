@@ -17,6 +17,7 @@ app.UseHttpsRedirection();
 
 app.MapGet("health", () => new
 {
+  service = "Gateway",
   status = "Running",
   port = Port,
   time = TimeOnly.FromDateTime(DateTime.UtcNow)
