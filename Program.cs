@@ -61,7 +61,7 @@ app.MapGet("health", () => new
   service = appConfig.Service,
   status = appConfig.Status,
   port = appConfig.Port,
-  time = TimeOnly.FromDateTime(DateTime.UtcNow)
+  time = appConfig.Time
 });
 
 await app.RunAsync();
