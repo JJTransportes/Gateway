@@ -1,5 +1,6 @@
 include:
   - ../Auth/docker-compose.yaml
+  - ../Api/docker-compose.yaml
 
 services:
   gateway:
