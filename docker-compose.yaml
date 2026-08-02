@@ -3,6 +3,7 @@ include:
   - ../Api/docker-compose.yaml
   - ../Services/docker-compose.yaml
   - ../PaymentGateway/docker-compose.yaml
+  - ../Webhooks/docker-compose.yaml
 
 services:
   gateway:
