@@ -1,6 +1,7 @@
 include:
   - ../Auth/docker-compose.yaml
   - ../Api/docker-compose.yaml
+  - ../Services/docker-compose.yaml
 
 services:
   gateway:
@@ -61,9 +62,6 @@ services:
       WebhooksConfig__Path: webhooks/{**catch-all}
       WebhooksConfig__Route: webhooks
       WebhooksConfig__RouteId: webhooks-route-id
-
-      Logging__LogLevel__Default: Information
-      Logging__LogLevel__Microsoft.AspNetCore: Warning
 
     networks:
       - local-network
